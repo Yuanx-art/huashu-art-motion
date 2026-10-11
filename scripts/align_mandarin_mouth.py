@@ -139,7 +139,7 @@ def force_align(logp, tokens, blank):
     path = np.empty(n, np.int32)
     for t in range(n - 1, -1, -1):
         path[t] = state
-        state -= back[t, state]
+        state -= int(back[t, state])
     spans = []
     for i in range(len(tokens)):
         frames = np.flatnonzero(path == 2 * i + 1)

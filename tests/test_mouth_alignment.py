@@ -15,6 +15,15 @@ class MouthAlignmentTests(unittest.TestCase):
         spans = mouth.force_align(np.log(probabilities), [1,1], 0)
         self.assertEqual(spans, [(0,1),(2,3)])
 
+    def test_long_transcript_backtrace_uses_python_integer(self):
+        # More than 128 states exposed NumPy int8 subtraction overflow.
+        tokens=[1,2]*100
+        probabilities=np.full((200,3),.01)
+        for i,token in enumerate(tokens): probabilities[i,token]=.98
+        spans=mouth.force_align(np.log(probabilities),tokens,0)
+        self.assertEqual(len(spans),200)
+        self.assertEqual(spans[-1],(199,200))
+
     def test_impossible_alignment_is_rejected(self):
         with self.assertRaises(ValueError):
             mouth.force_align(np.log(np.array([[.01,.99],[.01,.99]])), [1,1], 0)
